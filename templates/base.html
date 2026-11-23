@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Library Management System{% endblock %}</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+{% from "_icons.html" import icon %}
+<body>
+<div class="app-shell">
+  {% if session.get('user_id') %}
+  <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-checkbox">
+
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('index') }}">{{ icon('book', 'icon brand-icon') }}<span>LibrarySys</span></a>
+
+    <nav class="side-nav">
+      {% if session.get('role') == 'admin' %}
+        <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">{{ icon('dashboard') }}<span>Dashboard</span></a>
+        <a href="{{ url_for('books.list_books') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('books.') }}">{{ icon('book') }}<span>Books</span></a>
+        <a href="{{ url_for('members.list_members') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('members.') }}">{{ icon('users') }}<span>Members</span></a>
+        <a href="{{ url_for('borrow.all_borrowings') }}" class="{{ 'active' if request.endpoint == 'borrow.all_borrowings' }}">{{ icon('exchange') }}<span>Borrowings</span></a>
+        <a href="{{ url_for('fines.admin_fines') }}" class="{{ 'active' if request.endpoint == 'fines.admin_fines' }}">{{ icon('card') }}<span>Fines</span></a>
+        <a href="{{ url_for('reports.dashboard_reports') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('reports.') }}">{{ icon('chart') }}<span>Reports</span></a>
+      {% else %}
+        <a href="{{ url_for('member.dashboard') }}" class="{{ 'active' if request.endpoint == 'member.dashboard' }}">{{ icon('dashboard') }}<span>Dashboard</span></a>
+        <a href="{{ url_for('books.list_books') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('books.') }}">{{ icon('book') }}<span>Browse Books</span></a>
+        <a href="{{ url_for('member.my_borrowings') }}" class="{{ 'active' if request.endpoint == 'member.my_borrowings' }}">{{ icon('exchange') }}<span>My Borrowings</span></a>
+        <a href="{{ url_for('fines.my_fines') }}" class="{{ 'active' if request.endpoint == 'fines.my_fines' }}">{{ icon('card') }}<span>My Fines</span></a>
+        <a href="{{ url_for('chatbot.chatbot_page') }}" class="{{ 'active' if request.endpoint == 'chatbot.chatbot_page' }}">{{ icon('message') }}<span>Ask the Chatbot</span></a>
+      {% endif %}
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <span class="icon-circle">{{ icon('user') }}</span>
+        <div>
+          <div class="user-name">{{ session.get('name') }}</div>
+          <div class="user-role">{{ session.get('role') }}</div>
+        </div>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" class="btn-logout">{{ icon('logout') }}<span>Logout</span></a>
+    </div>
+  </aside>
+
+  <label for="sidebar-toggle" class="sidebar-backdrop"></label>
+  {% endif %}
+
+  <div class="main-col">
+    {% if session.get('user_id') %}
+    <header class="mobile-topbar">
+      <label for="sidebar-toggle" class="menu-btn">{{ icon('menu') }}</label>
+      <a class="brand" href="{{ url_for('index') }}">{{ icon('book', 'icon') }}<span>LibrarySys</span></a>
+    </header>
+    {% else %}
+    <header class="guest-topbar">
+      <a class="brand" href="{{ url_for('index') }}">{{ icon('book', 'icon brand-icon') }}<span>LibrarySys</span></a>
+    </header>
+    {% endif %}
+
+    <main class="page">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-wrap">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      <p>Web-Based Library Management System &copy; 2026</p>
+    </footer>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ member.Name }} - LibrarySys{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h1>{{ member.Name }}</h1>
+    <p class="subtitle">{{ member.Email }} · {{ member.Phone or 'No phone on file' }}</p>
+  </div>
+  <a class="btn btn-outline" href="{{ url_for('members.list_members') }}">{{ icon('arrow-left') }}<span>Back to members</span></a>
+</div>
+
+<div class="card">
+  <h2>Borrowing history</h2>
+  {% if borrow_history %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Book</th><th>Author</th><th>Borrowed</th><th>Due</th><th>Returned</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for h in borrow_history %}
+        <tr>
+          <td>{{ h.Title }}</td>
+          <td>{{ h.Author }}</td>
+          <td>{{ h.Borrow_Date }}</td>
+          <td>{{ h.Due_Date }}</td>
+          <td>{{ h.Return_Date or '—' }}</td>
+          <td>
+            {% if h.Status == 'Returned' %}
+              <span class="badge badge-returned">Returned</span>
+            {% else %}
+              <span class="badge badge-borrowed">Borrowed</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty-state">This member hasn't borrowed any books yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Books - LibrarySys{% endblock %}
+{% block content %}
+<div class="section-head">
+  <div>
+    <h1>Book Catalog</h1>
+    <p class="subtitle">Search by title, author, category, or ISBN. Availability shown in real time.</p>
+  </div>
+  {% if session.get('role') == 'admin' %}
+    <a class="btn" href="{{ url_for('books.add_book') }}">{{ icon('plus') }}<span>Add Book</span></a>
+  {% endif %}
+</div>
+
+<form method="GET" class="search-bar">
+  <div class="input-icon">{{ icon('search') }}<input type="text" name="q" placeholder="Search..." value="{{ q }}"></div>
+  <select name="field">
+    <option value="title" {% if field == 'title' %}selected{% endif %}>Title</option>
+    <option value="author" {% if field == 'author' %}selected{% endif %}>Author</option>
+    <option value="isbn" {% if field == 'isbn' %}selected{% endif %}>ISBN</option>
+    <option value="category" {% if field == 'category' %}selected{% endif %}>Category</option>
+  </select>
+  <select name="category_id">
+    <option value="">All categories</option>
+    {% for c in categories %}
+      <option value="{{ c.Category_ID }}" {% if category_id|string == c.Category_ID|string %}selected{% endif %}>{{ c.Category_Name }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn" type="submit">Search</button>
+  <a class="btn btn-outline" href="{{ url_for('books.list_books') }}">Reset</a>
+</form>
+
+{% if books %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in books %}
+      <tr>
+        <td>{{ b.Title }}</td>
+        <td>{{ b.Author }}</td>
+        <td>{{ b.ISBN }}</td>
+        <td>{{ b.Category_Name or '—' }}</td>
+        <td>
+          {% if b.Status == 'Available' %}
+            <span class="badge badge-available">Available</span>
+          {% else %}
+            <span class="badge badge-borrowed">Borrowed</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if session.get('role') == 'admin' %}
+            <a class="btn btn-small btn-outline" href="{{ url_for('books.edit_book', book_id=b.Book_ID) }}">{{ icon('edit') }}<span>Edit</span></a>
+            <form method="POST" action="{{ url_for('books.delete_book', book_id=b.Book_ID) }}" style="display:inline;" onsubmit="return confirm('Delete this book?');">
+              <button class="btn btn-small btn-danger" type="submit">{{ icon('trash') }}<span>Delete</span></button>
+            </form>
+          {% else %}
+            {% if b.Status == 'Available' %}
+              <form method="POST" action="{{ url_for('borrow.borrow_book', book_id=b.Book_ID) }}">
+                <button class="btn btn-small" type="submit">Borrow</button>
+              </form>
+            {% else %}
+              <span style="color:var(--muted); font-size:0.85rem;">Not available</span>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty-state">No books matched your search.</p>
+{% endif %}
+{% endblock %}

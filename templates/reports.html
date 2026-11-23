@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Reports - LibrarySys{% endblock %}
+{% block content %}
+<h1>Reports</h1>
+<p class="subtitle">System-wide statistics and downloadable CSV reports.</p>
+
+<div class="grid grid-4">
+  <div class="stat-card"><div><div class="value">{{ stats.total_books }}</div><div class="label">Total books</div></div><span class="stat-icon">{{ icon('book') }}</span></div>
+  <div class="stat-card"><div><div class="value">{{ stats.borrowed_books }}</div><div class="label">Borrowed now</div></div><span class="stat-icon">{{ icon('exchange') }}</span></div>
+  <div class="stat-card"><div><div class="value">{{ stats.total_members }}</div><div class="label">Members</div></div><span class="stat-icon">{{ icon('users') }}</span></div>
+  <div class="stat-card"><div><div class="value">{{ stats.overdue_loans }}</div><div class="label">Overdue loans</div></div><span class="stat-icon">{{ icon('alert') }}</span></div>
+</div>
+
+<div class="card">
+  <h2>Download reports (CSV)</h2>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <a class="btn btn-outline" href="{{ url_for('reports.export_report', report_type='books') }}">{{ icon('download') }}<span>Books report</span></a>
+    <a class="btn btn-outline" href="{{ url_for('reports.export_report', report_type='members') }}">{{ icon('download') }}<span>Members report</span></a>
+    <a class="btn btn-outline" href="{{ url_for('reports.export_report', report_type='borrowing') }}">{{ icon('download') }}<span>Borrowing report</span></a>
+    <a class="btn btn-outline" href="{{ url_for('reports.export_report', report_type='fines') }}">{{ icon('download') }}<span>Fines report</span></a>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Most borrowed books</h2>
+  {% if most_borrowed %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Author</th><th>Times borrowed</th></tr></thead>
+      <tbody>
+        {% for b in most_borrowed %}
+        <tr><td>{{ b.Title }}</td><td>{{ b.Author }}</td><td>{{ b.times_borrowed }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty-state">No borrowing data yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

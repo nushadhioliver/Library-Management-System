@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}My Dashboard - LibrarySys{% endblock %}
+{% block content %}
+<h1>Welcome, {{ session.get('name') }}</h1>
+<p class="subtitle">Here's a snapshot of your library account.</p>
+
+<div class="grid grid-3">
+  <div class="stat-card">
+    <div><div class="value">{{ active_loans|length }}</div><div class="label">Books currently borrowed</div></div>
+    <span class="stat-icon">{{ icon('exchange') }}</span>
+  </div>
+  <div class="stat-card">
+    <div><div class="value">{{ "%.2f"|format(unpaid_total) }}</div><div class="label">Unpaid fines</div></div>
+    <span class="stat-icon">{{ icon('card') }}</span>
+  </div>
+  <div class="stat-card">
+    <div><div class="value">{{ recommendations|length }}</div><div class="label">Books recommended for you</div></div>
+    <span class="stat-icon">{{ icon('book') }}</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-head">
+    <h2>Currently borrowed</h2>
+    <a href="{{ url_for('books.list_books') }}" class="btn btn-small">{{ icon('book') }}<span>Browse more books</span></a>
+  </div>
+  {% if active_loans %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Title</th><th>Author</th><th>Borrowed</th><th>Due</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for loan in active_loans %}
+        <tr>
+          <td>{{ loan.Title }}</td>
+          <td>{{ loan.Author }}</td>
+          <td>{{ loan.Borrow_Date }}</td>
+          <td>{{ loan.Due_Date }}</td>
+          <td>
+            {% if loan.is_overdue %}
+              <span class="badge badge-overdue">Overdue</span>
+            {% else %}
+              <span class="badge badge-borrowed">Borrowed</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('borrow.return_book', borrow_id=loan.Borrow_ID) }}">
+              <button class="btn btn-small btn-outline" type="submit">{{ icon('check') }}<span>Return</span></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty-state">You don't have any books borrowed right now.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Recommended for you</h2>
+  <p class="subtitle">Based on your borrowing history (rule-based recommendation).</p>
+  {% if recommendations %}
+  <div class="grid grid-3">
+    {% for book in recommendations %}
+    <div class="card">
+      <strong>{{ book.Title }}</strong><br>
+      <span style="color:var(--muted);">{{ book.Author }}</span><br>
+      <span class="badge badge-available" style="margin-top:8px;display:inline-block;">{{ book.Category_Name or 'Uncategorised' }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-state">Borrow a few books and we'll start recommending similar ones.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Ask the Chatbot - LibrarySys{% endblock %}
+{% block content %}
+<h1>Library Assistant</h1>
+<p class="subtitle">Ask about book availability, due dates, or get recommendations.</p>
+
+<div class="chat-wrap">
+  <div class="chat-messages" id="chat-messages">
+    <div class="msg msg-bot">
+      <span class="msg-avatar">{{ icon('bot') }}</span>
+      <span class="msg-bubble">Hi {{ session.get('name') }}! Ask me things like "Is 1984 available?" or type "help".</span>
+    </div>
+  </div>
+  <form class="chat-input-row" id="chat-form">
+    <input type="text" id="chat-input" placeholder="Type your question..." autocomplete="off" required>
+    <button type="submit" class="btn">{{ icon('send') }}<span>Send</span></button>
+  </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}

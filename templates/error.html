@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Error {{ code }} - LibrarySys{% endblock %}
+{% block content %}
+<div class="error-page">
+  {{ icon('alert') }}
+  <div class="code">{{ code }}</div>
+  <p>{{ message }}</p>
+  <a class="btn" href="{{ url_for('index') }}">{{ icon('arrow-left') }}<span>Back to home</span></a>
+</div>
+{% endblock %}

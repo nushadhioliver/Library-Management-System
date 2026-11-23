@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Borrowings - LibrarySys{% endblock %}
+{% block content %}
+<h1>All Borrowings</h1>
+<p class="subtitle">Every borrowing transaction in the system.</p>
+
+<div class="search-bar">
+  <a class="btn btn-small {{ 'btn-outline' if status != 'all' else '' }}" href="{{ url_for('borrow.all_borrowings', status='all') }}">All</a>
+  <a class="btn btn-small {{ 'btn-outline' if status != 'borrowed' else '' }}" href="{{ url_for('borrow.all_borrowings', status='borrowed') }}">Borrowed</a>
+  <a class="btn btn-small {{ 'btn-outline' if status != 'overdue' else '' }}" href="{{ url_for('borrow.all_borrowings', status='overdue') }}">Overdue</a>
+  <a class="btn btn-small {{ 'btn-outline' if status != 'returned' else '' }}" href="{{ url_for('borrow.all_borrowings', status='returned') }}">Returned</a>
+</div>
+
+{% if loans %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Member</th><th>Book</th><th>Borrowed</th><th>Due</th><th>Returned</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for l in loans %}
+      <tr>
+        <td>{{ l.Member_Name }}<br><span style="color:var(--muted); font-size:0.8rem;">{{ l.Member_Email }}</span></td>
+        <td>{{ l.Title }}</td>
+        <td>{{ l.Borrow_Date }}</td>
+        <td>{{ l.Due_Date }}</td>
+        <td>{{ l.Return_Date or '—' }}</td>
+        <td>
+          {% if l.Status == 'Returned' %}
+            <span class="badge badge-returned">Returned</span>
+          {% elif l.is_overdue %}
+            <span class="badge badge-overdue">Overdue</span>
+          {% else %}
+            <span class="badge badge-borrowed">Borrowed</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty-state">No borrowing records match this filter.</p>
+{% endif %}
+{% endblock %}

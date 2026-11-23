@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Fines - LibrarySys{% endblock %}
+{% block content %}
+<h1>Fine Management</h1>
+<p class="subtitle">All overdue fines issued to members.</p>
+
+<div class="search-bar">
+  <a class="btn btn-small {{ 'btn-outline' if status != 'all' else '' }}" href="{{ url_for('fines.admin_fines', status='all') }}">All</a>
+  <a class="btn btn-small {{ 'btn-outline' if status != 'unpaid' else '' }}" href="{{ url_for('fines.admin_fines', status='unpaid') }}">Unpaid</a>
+  <a class="btn btn-small {{ 'btn-outline' if status != 'paid' else '' }}" href="{{ url_for('fines.admin_fines', status='paid') }}">Paid</a>
+</div>
+
+{% if fines %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Member</th><th>Book</th><th>Amount</th><th>Issued</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for f in fines %}
+      <tr>
+        <td>{{ f.Member_Name }}<br><span style="color:var(--muted); font-size:0.8rem;">{{ f.Member_Email }}</span></td>
+        <td>{{ f.Title }}</td>
+        <td>{{ "%.2f"|format(f.Amount) }}</td>
+        <td>{{ f.Issue_Date }}</td>
+        <td>
+          {% if f.Paid_Status == 'Paid' %}
+            <span class="badge badge-paid">Paid</span>
+          {% else %}
+            <span class="badge badge-unpaid">Unpaid</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty-state">No fine records match this filter.</p>
+{% endif %}
+{% endblock %}

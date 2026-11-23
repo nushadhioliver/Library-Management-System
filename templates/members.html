@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Members - LibrarySys{% endblock %}
+{% block content %}
+<h1>Library Members</h1>
+<p class="subtitle">Manage member accounts and view their borrowing history.</p>
+
+<form method="GET" class="search-bar">
+  <div class="input-icon">{{ icon('search') }}<input type="text" name="q" placeholder="Search by name or email..." value="{{ q }}"></div>
+  <button class="btn" type="submit">Search</button>
+  <a class="btn btn-outline" href="{{ url_for('members.list_members') }}">Reset</a>
+</form>
+
+{% if members %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th></th></tr></thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td>{{ m.Name }}</td>
+        <td>{{ m.Email }}</td>
+        <td>{{ m.Phone or '—' }}</td>
+        <td>{{ m.Created_At }}</td>
+        <td>
+          <a class="btn btn-small btn-outline" href="{{ url_for('members.member_detail', member_id=m.Member_ID) }}">{{ icon('eye') }}<span>View</span></a>
+          <a class="btn btn-small btn-outline" href="{{ url_for('members.edit_member', member_id=m.Member_ID) }}">{{ icon('edit') }}<span>Edit</span></a>
+          <form method="POST" action="{{ url_for('members.delete_member', member_id=m.Member_ID) }}" style="display:inline;" onsubmit="return confirm('Remove this member?');">
+            <button class="btn btn-small btn-danger" type="submit">{{ icon('trash') }}<span>Delete</span></button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty-state">No members found.</p>
+{% endif %}
+{% endblock %}

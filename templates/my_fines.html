@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}My Fines - LibrarySys{% endblock %}
+{% block content %}
+<h1>My Fines</h1>
+<p class="subtitle">Outstanding balance: <strong>{{ "%.2f"|format(total_unpaid) }}</strong></p>
+
+{% if fines %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Book</th><th>Amount</th><th>Issued</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for f in fines %}
+      <tr>
+        <td>{{ f.Title }}</td>
+        <td>{{ "%.2f"|format(f.Amount) }}</td>
+        <td>{{ f.Issue_Date }}</td>
+        <td>
+          {% if f.Paid_Status == 'Paid' %}
+            <span class="badge badge-paid">Paid</span>
+          {% else %}
+            <span class="badge badge-unpaid">Unpaid</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if f.Paid_Status == 'Unpaid' %}
+          <form method="POST" action="{{ url_for('fines.pay_fine', fine_id=f.Fine_ID) }}">
+            <button class="btn btn-small" type="submit">{{ icon('check') }}<span>Mark as Paid</span></button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="empty-state">You have no fines. Keep returning books on time!</p>
+{% endif %}
+{% endblock %}
